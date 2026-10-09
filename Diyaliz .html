@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Kt/V + URR Hesaplama</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
+}
+
+body{
+    background:#0f172a;
+    padding:20px;
+    color:white;
+    min-height:100vh;
+    position:relative;
+}
+
+.container{
+    max-width:1200px;
+    margin:auto;
+}
+
+.title{
+    background:#334155;
+    padding:15px;
+    border-radius:10px;
+    font-size:24px;
+    font-weight:bold;
+    margin-bottom:15px;
+    text-align:center;
+}
+
+.formula{
+    background:#facc15;
+    color:#111827;
+    padding:15px;
+    border-radius:10px;
+    margin-bottom:20px;
+    line-height:1.8;
+    font-weight:bold;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+}
+
+.left{
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+}
+
+.input-group{
+    display:flex;
+    background:#1e293b;
+    border-radius:10px;
+    overflow:hidden;
+}
+
+.input-group label{
+    width:45%;
+    padding:15px;
+    background:#334155;
+    font-weight:bold;
+}
+
+.input-group input{
+    width:55%;
+    border:none;
+    outline:none;
+    padding:15px;
+    font-size:18px;
+}
+
+button{
+    margin-top:10px;
+    padding:15px;
+    border:none;
+    border-radius:10px;
+    color:white;
+    font-size:18px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.hesapla-btn{
+    background:#6366f1;
+}
+
+.hesapla-btn:hover{
+    background:#4f46e5;
+}
+
+.temizle-btn{
+    background:#ef4444;
+}
+
+.temizle-btn:hover{
+    background:#dc2626;
+}
+
+.result-box{
+    background:#dcfce7;
+    border-radius:10px;
+    padding:25px;
+    color:#111827;
+    min-height:350px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+}
+
+.result-value{
+    font-size:42px;
+    color:#16a34a;
+    margin:10px 0;
+    font-weight:bold;
+}
+
+.urr-value{
+    font-size:38px;
+    color:#2563eb;
+    margin:10px 0;
+    font-weight:bold;
+}
+
+.info{
+    margin-top:10px;
+    font-size:16px;
+    color:#374151;
+}
+
+hr{
+    margin:20px 0;
+    border:none;
+    border-top:2px solid #cbd5e1;
+}
+
+.footer{
+    position:fixed;
+    bottom:10px;
+    right:15px;
+    color:#cbd5e1;
+    font-size:14px;
+    opacity:0.8;
+}
+
+@media(max-width:850px){
+
+    .grid{
+        grid-template-columns:1fr;
+    }
+
+    .title{
+        font-size:20px;
+    }
+
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="title">
+        Kt/V + URR Diyaliz Hesaplama Sistemi
+    </div>
+
+    <div class="formula">
+
+        <b>Kt/V Formülü:</b><br>
+
+        Kt/V =
+        -ln((BUN Post / BUN Pre) - (0.008 × Saat))
+        +
+        ((4 - (3.5 × BUN Post / BUN Pre)) × UF Vol / Ağırlık)
+
+        <br><br>
+
+        <b>URR Formülü:</b><br>
+
+        URR =
+        ((BUN Pre - BUN Post) / BUN Pre) × 100
+
+    </div>
+
+    <div class="grid">
+
+        <div class="left">
+
+            <div class="input-group">
+                <label>BUN Pre</label>
+                <input type="number" id="bunPre" step="0.01">
+            </div>
+
+            <div class="input-group">
+                <label>BUN Post mg/dl</label>
+                <input type="number" id="bunPost" step="0.01">
+            </div>
+
+            <div class="input-group">
+                <label>Saat</label>
+                <input type="number" id="saat" step="0.01">
+            </div>
+
+            <div class="input-group">
+                <label>UF Vol (Litre)</label>
+                <input type="number" id="uf" step="0.01">
+            </div>
+
+            <div class="input-group">
+                <label>Ağırlık (kg)</label>
+                <input type="number" id="agirlik" step="0.01">
+            </div>
+
+            <button class="hesapla-btn" onclick="hesapla()">
+                Hesapla
+            </button>
+
+            <button class="temizle-btn" onclick="temizle()">
+                Temizle
+            </button>
+
+        </div>
+
+        <div class="result-box" id="sonuc">
+            Sonuçları görmek için tüm alanları doldurun
+        </div>
+
+    </div>
+
+</div>
+
+<div class="footer">
+    Hakan tarafından yapılmıştır
+</div>
+
+<script>
+
+// Otomatik hesaplama: input alanlarına her yazıldığında tetiklenir
+const inputIds = ["bunPre", "bunPost", "saat", "uf", "agirlik"];
+
+inputIds.forEach(function(id){
+    document.getElementById(id).addEventListener("input", otomatikHesapla);
+});
+
+function otomatikHesapla(){
+
+    let bunPre = parseFloat(document.getElementById("bunPre").value);
+    let bunPost = parseFloat(document.getElementById("bunPost").value);
+    let saat = parseFloat(document.getElementById("saat").value);
+    let uf = parseFloat(document.getElementById("uf").value);
+    let agirlik = parseFloat(document.getElementById("agirlik").value);
+
+    // Alanların hepsi dolu değilse bekle
+    if(
+        isNaN(bunPre) ||
+        isNaN(bunPost) ||
+        isNaN(saat) ||
+        isNaN(uf) ||
+        isNaN(agirlik)
+    ){
+        document.getElementById("sonuc").innerHTML =
+        "Sonuçları görmek için tüm alanları doldurun";
+        return;
+    }
+
+    // Sıfıra bölme kontrolü
+    if(bunPre === 0 || agirlik === 0){
+        document.getElementById("sonuc").innerHTML =
+        "Geçersiz değer girdiniz.";
+        return;
+    }
+
+    // Kt/V Hesabı
+    let oran = bunPost / bunPre;
+
+    let ktv =
+        -Math.log(oran - (0.008 * saat))
+        +
+        ((4 - (3.5 * oran)) * uf / agirlik);
+
+    // URR Hesabı
+    let urr =
+        ((bunPre - bunPost) / bunPre) * 100;
+
+    if(isNaN(ktv) || !isFinite(ktv)){
+        document.getElementById("sonuc").innerHTML =
+        "Geçersiz değer girdiniz.";
+        return;
+    }
+
+    // Kt/V değerlendirme
+    let ktvDurum = "";
+
+    if(ktv >= 1.4){
+        ktvDurum = "Kt/V iyi";
+    }
+    else if(ktv >= 1.2){
+        ktvDurum = "Kt/V sınırda";
+    }
+    else{
+        ktvDurum = "Kt/V düşük";
+    }
+
+    // URR değerlendirme
+    let urrDurum = "";
+
+    if(urr >= 65){
+        urrDurum = "URR yeterli";
+    }
+    else{
+        urrDurum = "URR düşük";
+    }
+
+    document.getElementById("sonuc").innerHTML = `
+
+        <div>
+
+            <div>
+                Kt/V Sonucu
+            </div>
+
+            <div class="result-value">
+                ${ktv.toFixed(2)}
+            </div>
+
+            <div class="info">
+                ${ktvDurum}
+            </div>
+
+            <hr>
+
+            <div>
+                URR Sonucu
+            </div>
+
+            <div class="urr-value">
+                %${urr.toFixed(2)}
+            </div>
+
+            <div class="info">
+                ${urrDurum}
+            </div>
+
+        </div>
+
+    `;
+}
+
+function hesapla(){
+    otomatikHesapla();
+}
+
+function temizle(){
+
+    document.getElementById("bunPre").value = "";
+    document.getElementById("bunPost").value = "";
+    document.getElementById("saat").value = "";
+    document.getElementById("uf").value = "";
+    document.getElementById("agirlik").value = "";
+
+    document.getElementById("sonuc").innerHTML =
+    "Sonuçları görmek için tüm alanları doldurun";
+
+}
+
+</script>
+
+</body>
+</html>
