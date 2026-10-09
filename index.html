@@ -27,7 +27,7 @@ body.light-theme {
     --title-bg: #cbd5e1;
     --input-bg: #ffffff;
     --label-bg: #e2e8f0;
-    --result-bg: #dcfce7; /* Sonuç kutusu yeşil kalsın */
+    --result-bg: #dcfce7;
     --result-text: #111827;
     --formula-bg: #fef08a;
     --formula-text: #111827;
@@ -215,9 +215,9 @@ hr{
     border-top:2px solid #cbd5e1;
 }
 
-/* Özellik 4: Uyarı Sistemi Kutusu */
+/* Özellik 4: Uyarı Sistemi Kutusu - ÇALIŞAN VERSİYON */
 .warning-box {
-    display: none;
+    display: block;
     background: #fef2f2;
     border: 2px solid #ef4444;
     color: #b91c1c;
@@ -227,6 +227,13 @@ hr{
     font-weight: bold;
     font-size: 15px;
     text-align: left;
+    line-height: 1.6;
+    animation: uyariPulse 1.5s infinite;
+}
+
+@keyframes uyariPulse {
+    0%, 100% { border-color: #ef4444; }
+    50% { border-color: #fca5a5; }
 }
 
 .footer{
@@ -239,8 +246,10 @@ hr{
 
 @media(max-width:850px){
     .grid{ grid-template-columns:1fr; }
-    .title{ font-size:20px; }
-    .tema-btn { width: 35px; height: 35px; font-size: 16px; top: 12px; }
+    .title{ font-size:18px; padding-right: 60px; }
+    .tema-btn { width: 38px; height: 38px; font-size: 16px; top: 12px; right: 8px; }
+    .input-group label { font-size: 14px; padding: 12px 10px; }
+    .btn-arrow { width: 40px; height: 48px; font-size: 20px; }
 }
 </style>
 </head>
@@ -250,7 +259,6 @@ hr{
 
     <div class="title">
         Kt/V + URR Diyaliz Hesaplama Sistemi
-        <!-- Özellik 5: Tema Değiştirme Butonu -->
         <button class="tema-btn" onclick="temaDegistir()" title="Temayı Değiştir">🌗</button>
     </div>
 
@@ -345,7 +353,6 @@ fieldOrder.forEach(function(id, index) {
 /* Özellik 5: Tema Değiştirme Fonksiyonu */
 function temaDegistir() {
     document.body.classList.toggle("light-theme");
-    // İkonu güncelle (Aydınlık modda güneş, karanlık modda ay)
     let btn = document.querySelector(".tema-btn");
     if (document.body.classList.contains("light-theme")) {
         btn.innerHTML = "☀️";
@@ -374,12 +381,12 @@ function otomatikHesapla(){
     let agirlik = parseFloat(document.getElementById("agirlik").value);
 
     if(isNaN(bunPre) || isNaN(bunPost) || isNaN(saat) || isNaN(uf) || isNaN(agirlik)){
-        document.getElementById("sonuc").innerHTML = "Sonuçları görmek için tüm alanları doldurun";
+        document.getElementById("sonuc").innerHTML = "<div>Sonuçları görmek için tüm alanları doldurun</div>";
         return;
     }
 
     if(bunPre === 0 || agirlik === 0){
-        document.getElementById("sonuc").innerHTML = "Geçersiz değer girdiniz.";
+        document.getElementById("sonuc").innerHTML = "<div>Geçersiz değer girdiniz.</div>";
         return;
     }
 
@@ -388,36 +395,43 @@ function otomatikHesapla(){
     let urr = ((bunPre - bunPost) / bunPre) * 100;
 
     if(isNaN(ktv) || !isFinite(ktv)){
-        document.getElementById("sonuc").innerHTML = "Geçersiz değer girdiniz.";
+        document.getElementById("sonuc").innerHTML = "<div>Geçersiz değer girdiniz.</div>";
         return;
     }
 
     let ktvDurum = ktv >= 1.4 ? "Kt/V iyi" : (ktv >= 1.2 ? "Kt/V sınırda" : "Kt/V düşük");
     let urrDurum = urr >= 65 ? "URR yeterli" : "URR düşük";
 
-    /* Özellik 4: Uyarı Sistemi Kontrolü */
+    /* Özellik 4: Uyarı Sistemi - ÇALIŞAN VERSİYON */
     let uyariHTML = "";
-    if (ktv < 1.2 || urr < 65) {
-        uyariHTML = `
-            <div class="warning-box">
-                ⚠️ DİKKAT: Kt/V değeri çok düşük! <br> 
-                Lütfen diyaliz süresini, kan akış hızını veya dializat akış hızını gözden geçirin.
-            </div>
-        `;
+    let uyarilar = [];
+
+    if (ktv < 1.2) {
+        uyarilar.push("• Kt/V değeri çok düşük (" + ktv.toFixed(2) + " < 1.20)");
+    }
+    if (urr < 65) {
+        uyarilar.push("• URR değeri çok düşük (%" + urr.toFixed(2) + " < %65)");
     }
 
-    document.getElementById("sonuc").innerHTML = `
-        <div style="width:100%">
-            <div>Kt/V Sonucu</div>
-            <div class="result-value">${ktv.toFixed(2)}</div>
-            <div class="info">${ktvDurum}</div>
-            <hr>
-            <div>URR Sonucu</div>
-            <div class="urr-value">%${urr.toFixed(2)}</div>
-            <div class="info">${urrDurum}</div>
-            ${uyariHTML}
-        </div>
-    `;
+    if (uyarilar.length > 0) {
+        uyariHTML = '<div class="warning-box">' +
+            '⚠️ <u>DİKKAT!</u><br><br>' +
+            uyarilar.join("<br>") +
+            '<br><br>👉 Lütfen diyaliz süresini, kan akış hızını veya dializat akış hızını gözden geçirin.' +
+            '</div>';
+    }
+
+    document.getElementById("sonuc").innerHTML = 
+        '<div style="width:100%">' +
+            '<div>Kt/V Sonucu</div>' +
+            '<div class="result-value">' + ktv.toFixed(2) + '</div>' +
+            '<div class="info">' + ktvDurum + '</div>' +
+            '<hr>' +
+            '<div>URR Sonucu</div>' +
+            '<div class="urr-value">%' + urr.toFixed(2) + '</div>' +
+            '<div class="info">' + urrDurum + '</div>' +
+            uyariHTML +
+        '</div>';
 }
 
 function temizle(){
@@ -426,7 +440,7 @@ function temizle(){
     document.getElementById("saat").value = "";
     document.getElementById("uf").value = "";
     document.getElementById("agirlik").value = "";
-    document.getElementById("sonuc").innerHTML = "Sonuçları görmek için tüm alanları doldurun";
+    document.getElementById("sonuc").innerHTML = "<div>Sonuçları görmek için tüm alanları doldurun</div>";
 }
 
 </script>
