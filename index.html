@@ -2,254 +2,304 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Kt/V + URR Diyaliz Hesaplama</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>Kt/V + URR Hesaplama</title>
 
 <style>
-/* Tema Değişkenleri */
-:root {
-    --bg-color: #0f172a;
-    --text-color: #ffffff;
-    --title-bg: #334155;
-    --input-bg: #1e293b;
-    --label-bg: #334155;
-    --result-bg: #dcfce7;
-    --result-text: #111827;
-    --formula-bg: #facc15;
-    --formula-text: #111827;
-    --footer-color: #cbd5e1;
-}
-
-/* Aydınlık Tema Değişkenleri */
-body.light-theme {
-    --bg-color: #f1f5f9;
-    --text-color: #0f172a;
-    --title-bg: #cbd5e1;
-    --input-bg: #ffffff;
-    --label-bg: #e2e8f0;
-    --result-bg: #dcfce7;
-    --result-text: #111827;
-    --formula-bg: #fef08a;
-    --formula-text: #111827;
-    --footer-color: #475569;
-}
-
 *{
     margin:0;
     padding:0;
     box-sizing:border-box;
-    font-family:Arial, sans-serif;
+    font-family:'Segoe UI', Arial, sans-serif;
+    -webkit-tap-highlight-color: transparent;
 }
 
 body{
-    background:var(--bg-color);
-    padding:20px;
-    color:var(--text-color);
-    min-height:100vh;
-    position:relative;
-    transition: background 0.3s, color 0.3s;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    padding: 16px;
+    color: white;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 .container{
-    max-width:1200px;
-    margin:auto;
+    max-width: 1100px;
+    width: 100%;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
 }
 
+/* ÜST BAŞLIK */
 .title{
-    background:var(--title-bg);
-    padding:18px;
-    border-radius:12px;
-    text-align:center;
-    font-size:32px;
-    font-weight:bold;
-    margin-bottom:20px;
-    box-shadow:0 0 15px rgba(0,0,0,0.3);
-    position: relative;
-}
-
-/* Tema Butonu */
-.tema-btn {
-    position: absolute;
-    right: 10px;
-    top: 15px;
-    background: #6366f1;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 45px;
-    height: 45px;
-    font-size: 20px;
-    cursor: pointer;
-    transition: 0.3s;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    padding: 18px 20px;
+    border-radius: 14px;
+    font-size: 22px;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: 0.3px;
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.35);
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0;
-    padding: 0;
+    gap: 10px;
 }
-.tema-btn:hover { background: #4f46e5; }
+.title span { font-size: 26px; }
 
+/* FORMÜL KUTUSU */
 .formula{
-    background:var(--formula-bg);
-    color:var(--formula-text);
-    padding:15px;
-    border-radius:10px;
-    margin-bottom:20px;
-    line-height:1.8;
-    font-weight:bold;
+    background: linear-gradient(135deg, #facc15, #f59e0b);
+    color: #111827;
+    padding: 16px 18px;
+    border-radius: 12px;
+    line-height: 1.7;
+    font-weight: 600;
+    font-size: 14px;
+    box-shadow: 0 6px 16px rgba(250, 204, 21, 0.25);
+}
+.formula b { display:block; margin-bottom: 4px; font-size: 15px; }
+.formula .formula-text {
+    font-family: 'Courier New', monospace;
+    background: rgba(255,255,255,0.35);
+    padding: 6px 10px;
+    border-radius: 6px;
+    display: inline-block;
+    margin-top: 3px;
+    font-size: 13px;
+    word-break: break-word;
 }
 
+/* ANA GRID */
 .grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
 }
 
 .left{
-    display:flex;
-    flex-direction:column;
-    gap:15px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
+/* INPUT KUTULARI */
 .input-group{
-    display:flex;
-    background:var(--input-bg);
-    border-radius:10px;
-    overflow:hidden;
-    align-items:center;
-    border: 1px solid rgba(148, 163, 184, 0.2);
+    display: flex;
+    background: #1e293b;
+    border-radius: 12px;
+    overflow: hidden;
+    align-items: stretch;
+    border: 1px solid rgba(148, 163, 184, 0.15);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.input-group:focus-within {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
 }
 
 .input-group label{
-    width:45%;
-    padding:15px;
-    background:var(--label-bg);
-    font-weight:bold;
-    color: var(--text-color);
+    width: 42%;
+    padding: 14px 12px;
+    background: #334155;
+    font-weight: 600;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    color: #e2e8f0;
 }
 
 .input-group input{
-    flex:1;
-    width:100%;
-    border:none;
-    outline:none;
-    padding:15px;
-    font-size:18px;
-    text-align:center;
-    background:var(--input-bg);
-    color:var(--text-color);
+    flex: 1;
+    width: 100%;
+    min-width: 0;
+    border: none;
+    outline: none;
+    padding: 14px 8px;
+    font-size: 17px;
+    font-weight: 600;
+    text-align: center;
+    background: #1e293b;
+    color: #f1f5f9;
 }
+.input-group input::placeholder { color: #64748b; }
 
+/* + / - BUTONLARI */
 .btn-arrow{
-    background:#475569;
-    color:white;
-    border:none;
-    width:50px;
-    height:53px;
-    font-size:24px;
-    font-weight:bold;
-    cursor:pointer;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    transition:0.2s;
+    background: #475569;
+    color: white;
+    border: none;
+    width: 44px;
+    min-width: 44px;
+    font-size: 22px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, transform 0.1s;
+    user-select: none;
 }
+.btn-arrow:hover{ background: #6366f1; }
+.btn-arrow:active{ background: #4f46e5; transform: scale(0.95); }
 
-.btn-arrow:hover{
-    background:#6366f1;
-}
-
+/* ANA BUTONLAR */
 button{
-    margin-top:10px;
-    padding:15px;
-    border:none;
-    border-radius:10px;
-    color:white;
-    font-size:18px;
-    cursor:pointer;
-    transition:0.3s;
+    margin-top: 6px;
+    padding: 16px;
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.2s, background 0.2s;
+    letter-spacing: 0.3px;
 }
 
-.hesapla-btn{ background:#6366f1; }
-.hesapla-btn:hover{ background:#4f46e5; }
+.hesapla-btn{
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+}
+.hesapla-btn:hover{
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.55);
+}
+.hesapla-btn:active{ transform: scale(0.98); }
 
-.temizle-btn{ background:#ef4444; }
-.temizle-btn:hover{ background:#dc2626; }
+.temizle-btn{
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    box-shadow: 0 6px 16px rgba(239, 68, 68, 0.35);
+}
+.temizle-btn:hover{
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+}
+.temizle-btn:active{ transform: scale(0.98); }
 
+/* SONUÇ KUTUSU */
 .result-box{
-    background:var(--result-bg);
-    border-radius:10px;
-    padding:25px;
-    color:var(--result-text);
-    min-height:350px;
-    display:flex;
-    flex-direction: column;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
+    background: linear-gradient(135deg, #ecfdf5, #dcfce7);
+    border-radius: 14px;
+    padding: 24px 20px;
+    color: #111827;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(16, 185, 129, 0.2);
+    min-height: 100%;
+    animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.result-inner { width: 100%; }
+
+.result-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .result-value{
-    font-size:42px;
-    color:#16a34a;
-    margin:10px 0;
-    font-weight:bold;
+    font-size: 46px;
+    color: #16a34a;
+    margin: 6px 0;
+    font-weight: 800;
+    line-height: 1;
 }
 
 .urr-value{
-    font-size:38px;
-    color:#2563eb;
-    margin:10px 0;
-    font-weight:bold;
+    font-size: 40px;
+    color: #2563eb;
+    margin: 6px 0;
+    font-weight: 800;
+    line-height: 1;
 }
 
 .info{
-    margin-top:10px;
-    font-size:16px;
-    color:#374151;
+    font-size: 14px;
+    color: #475569;
+    font-weight: 600;
+    padding: 5px 12px;
+    background: rgba(255,255,255,0.7);
+    border-radius: 20px;
+    display: inline-block;
+    margin-top: 4px;
 }
 
 hr{
-    margin:20px 0;
-    border:none;
-    border-top:2px solid #cbd5e1;
+    margin: 16px auto;
+    border: none;
+    border-top: 1px dashed #94a3b8;
+    width: 60%;
 }
 
-/* Özellik 4: Uyarı Sistemi Kutusu - ÇALIŞAN VERSİYON */
-.warning-box {
-    display: block;
-    background: #fef2f2;
-    border: 2px solid #ef4444;
-    color: #b91c1c;
-    padding: 15px;
-    border-radius: 8px;
-    margin-top: 15px;
-    font-weight: bold;
+.empty-msg {
+    color: #475569;
     font-size: 15px;
-    text-align: left;
-    line-height: 1.6;
-    animation: uyariPulse 1.5s infinite;
+    font-weight: 600;
+    padding: 20px;
 }
 
-@keyframes uyariPulse {
-    0%, 100% { border-color: #ef4444; }
-    50% { border-color: #fca5a5; }
-}
-
+/* FOOTER */
 .footer{
-    margin-top: 20px;
     text-align: center;
-    color:var(--footer-color);
-    font-size:14px;
-    opacity:0.8;
+    color: #94a3b8;
+    font-size: 13px;
+    padding: 12px 0 4px 0;
+    opacity: 0.85;
 }
 
-@media(max-width:850px){
-    .grid{ grid-template-columns:1fr; }
-    .title{ font-size:18px; padding-right: 60px; }
-    .tema-btn { width: 38px; height: 38px; font-size: 16px; top: 12px; right: 8px; }
-    .input-group label { font-size: 14px; padding: 12px 10px; }
-    .btn-arrow { width: 40px; height: 48px; font-size: 20px; }
+/* ---------- MOBİL UYUM ---------- */
+@media(max-width: 780px){
+    body { padding: 12px; }
+    .container { gap: 12px; }
+    .title { font-size: 17px; padding: 15px 16px; border-radius: 12px; }
+    .title span { font-size: 22px; }
+    .formula { font-size: 12.5px; padding: 13px 14px; line-height: 1.6; }
+    .formula b { font-size: 13.5px; }
+    .formula .formula-text { font-size: 11.5px; }
+
+    .grid { grid-template-columns: 1fr; gap: 12px; }
+
+    .input-group label {
+        width: 40%;
+        padding: 12px 10px;
+        font-size: 13px;
+    }
+    .input-group input {
+        padding: 12px 6px;
+        font-size: 16px;
+    }
+    .btn-arrow {
+        width: 40px;
+        min-width: 40px;
+        font-size: 20px;
+    }
+
+    button { padding: 14px; font-size: 16px; margin-top: 4px; }
+
+    .result-box { padding: 20px 16px; }
+    .result-value { font-size: 40px; }
+    .urr-value { font-size: 34px; }
+    .result-label { font-size: 12.5px; }
+}
+
+/* Çok küçük ekranlar */
+@media(max-width: 380px){
+    .input-group label { font-size: 12px; padding: 11px 8px; }
+    .btn-arrow { width: 36px; min-width: 36px; font-size: 18px; }
+    .result-value { font-size: 34px; }
+    .urr-value { font-size: 30px; }
 }
 </style>
 </head>
@@ -258,70 +308,72 @@ hr{
 <div class="container">
 
     <div class="title">
+        <span>🩺</span>
         Kt/V + URR Diyaliz Hesaplama Sistemi
-        <button class="tema-btn" onclick="temaDegistir()" title="Temayı Değiştir">🌗</button>
     </div>
 
     <div class="formula">
-        <b>Kt/V Formülü:</b><br>
-        Kt/V = -ln((BUN Post / BUN Pre) - (0.008 × Saat)) + ((4 - (3.5 × BUN Post / BUN Pre)) × UF Vol / Ağırlık)
+        <b>📐 Kt/V Formülü:</b>
+        <span class="formula-text">-ln((BUN Post / BUN Pre) - (0.008 × Saat)) + ((4 - (3.5 × BUN Post / BUN Pre)) × UF Vol / Ağırlık)</span>
         <br><br>
-        <b>URR Formülü:</b><br>
-        URR = ((BUN Pre - BUN Post) / BUN Pre) × 100
+        <b>📊 URR Formülü:</b>
+        <span class="formula-text">((BUN Pre - BUN Post) / BUN Pre) × 100</span>
     </div>
 
     <div class="grid">
 
         <div class="left">
+
             <div class="input-group">
                 <label>BUN Pre</label>
-                <button class="btn-arrow" onclick="degistir('bunPre', -1)">-</button>
-                <input type="number" id="bunPre" step="0.01" placeholder="0">
+                <button class="btn-arrow" onclick="degistir('bunPre', -1)">−</button>
+                <input type="number" id="bunPre" step="0.01" placeholder="0" inputmode="decimal">
                 <button class="btn-arrow" onclick="degistir('bunPre', 1)">+</button>
             </div>
 
             <div class="input-group">
                 <label>BUN Post mg/dl</label>
-                <button class="btn-arrow" onclick="degistir('bunPost', -1)">-</button>
-                <input type="number" id="bunPost" step="0.01" placeholder="0">
+                <button class="btn-arrow" onclick="degistir('bunPost', -1)">−</button>
+                <input type="number" id="bunPost" step="0.01" placeholder="0" inputmode="decimal">
                 <button class="btn-arrow" onclick="degistir('bunPost', 1)">+</button>
             </div>
 
             <div class="input-group">
                 <label>Saat</label>
-                <button class="btn-arrow" onclick="degistir('saat', -1)">-</button>
-                <input type="number" id="saat" step="0.01" placeholder="0">
+                <button class="btn-arrow" onclick="degistir('saat', -1)">−</button>
+                <input type="number" id="saat" step="0.01" placeholder="0" inputmode="decimal">
                 <button class="btn-arrow" onclick="degistir('saat', 1)">+</button>
             </div>
 
             <div class="input-group">
                 <label>UF Vol (Litre)</label>
-                <button class="btn-arrow" onclick="degistir('uf', -1)">-</button>
-                <input type="number" id="uf" step="0.01" placeholder="0">
+                <button class="btn-arrow" onclick="degistir('uf', -1)">−</button>
+                <input type="number" id="uf" step="0.01" placeholder="0" inputmode="decimal">
                 <button class="btn-arrow" onclick="degistir('uf', 1)">+</button>
             </div>
 
             <div class="input-group">
                 <label>Ağırlık (kg)</label>
-                <button class="btn-arrow" onclick="degistir('agirlik', -1)">-</button>
-                <input type="number" id="agirlik" step="0.01" placeholder="0">
+                <button class="btn-arrow" onclick="degistir('agirlik', -1)">−</button>
+                <input type="number" id="agirlik" step="0.01" placeholder="0" inputmode="decimal">
                 <button class="btn-arrow" onclick="degistir('agirlik', 1)">+</button>
             </div>
 
-            <button class="hesapla-btn" onclick="otomatikHesapla()">Hesapla</button>
-            <button class="temizle-btn" onclick="temizle()">Temizle</button>
+            <button class="hesapla-btn" onclick="otomatikHesapla()">🧮 Hesapla</button>
+            <button class="temizle-btn" onclick="temizle()">🗑️ Temizle</button>
+
         </div>
 
         <div class="result-box" id="sonuc">
-            <div>Sonuçları görmek için tüm alanları doldurun</div>
+            <div class="empty-msg">Sonuçları görmek için tüm alanları doldurun</div>
         </div>
 
     </div>
 
-</div>
+    <div class="footer">
+        Hakan tarafından yapılmıştır
+    </div>
 
-<div class="footer">
-    Hakan tarafından yapılmıştır
 </div>
 
 <script>
@@ -331,6 +383,7 @@ const fieldOrder = ["bunPre", "bunPost", "saat", "uf", "agirlik"];
 fieldOrder.forEach(function(id, index) {
     let inputElement = document.getElementById(id);
     inputElement.addEventListener("input", otomatikHesapla);
+
     inputElement.addEventListener("keydown", function(e) {
         if (e.key === "ArrowDown") {
             e.preventDefault();
@@ -350,19 +403,6 @@ fieldOrder.forEach(function(id, index) {
     });
 });
 
-/* Özellik 5: Tema Değiştirme Fonksiyonu */
-function temaDegistir() {
-    document.body.classList.toggle("light-theme");
-    let btn = document.querySelector(".tema-btn");
-    if (document.body.classList.contains("light-theme")) {
-        btn.innerHTML = "☀️";
-        btn.style.background = "#f59e0b";
-    } else {
-        btn.innerHTML = "🌙";
-        btn.style.background = "#6366f1";
-    }
-}
-
 function degistir(id, miktar) {
     let input = document.getElementById(id);
     let mevcutDeger = parseFloat(input.value);
@@ -370,7 +410,7 @@ function degistir(id, miktar) {
     let yeniDeger = mevcutDeger + miktar;
     if (yeniDeger < 0) yeniDeger = 0;
     input.value = yeniDeger;
-    otomatikHesapla(); 
+    otomatikHesapla();
 }
 
 function otomatikHesapla(){
@@ -381,12 +421,12 @@ function otomatikHesapla(){
     let agirlik = parseFloat(document.getElementById("agirlik").value);
 
     if(isNaN(bunPre) || isNaN(bunPost) || isNaN(saat) || isNaN(uf) || isNaN(agirlik)){
-        document.getElementById("sonuc").innerHTML = "<div>Sonuçları görmek için tüm alanları doldurun</div>";
+        document.getElementById("sonuc").innerHTML = '<div class="empty-msg">Sonuçları görmek için tüm alanları doldurun</div>';
         return;
     }
 
     if(bunPre === 0 || agirlik === 0){
-        document.getElementById("sonuc").innerHTML = "<div>Geçersiz değer girdiniz.</div>";
+        document.getElementById("sonuc").innerHTML = '<div class="empty-msg">Geçersiz değer girdiniz.</div>';
         return;
     }
 
@@ -395,43 +435,24 @@ function otomatikHesapla(){
     let urr = ((bunPre - bunPost) / bunPre) * 100;
 
     if(isNaN(ktv) || !isFinite(ktv)){
-        document.getElementById("sonuc").innerHTML = "<div>Geçersiz değer girdiniz.</div>";
+        document.getElementById("sonuc").innerHTML = '<div class="empty-msg">Geçersiz değer girdiniz.</div>';
         return;
     }
 
-    let ktvDurum = ktv >= 1.4 ? "Kt/V iyi" : (ktv >= 1.2 ? "Kt/V sınırda" : "Kt/V düşük");
-    let urrDurum = urr >= 65 ? "URR yeterli" : "URR düşük";
+    let ktvDurum = ktv >= 1.4 ? "✅ Kt/V iyi" : (ktv >= 1.2 ? "⚠️ Kt/V sınırda" : "❌ Kt/V düşük");
+    let urrDurum = urr >= 65 ? "✅ URR yeterli" : "❌ URR düşük";
 
-    /* Özellik 4: Uyarı Sistemi - ÇALIŞAN VERSİYON */
-    let uyariHTML = "";
-    let uyarilar = [];
-
-    if (ktv < 1.2) {
-        uyarilar.push("• Kt/V değeri çok düşük (" + ktv.toFixed(2) + " < 1.20)");
-    }
-    if (urr < 65) {
-        uyarilar.push("• URR değeri çok düşük (%" + urr.toFixed(2) + " < %65)");
-    }
-
-    if (uyarilar.length > 0) {
-        uyariHTML = '<div class="warning-box">' +
-            '⚠️ <u>DİKKAT!</u><br><br>' +
-            uyarilar.join("<br>") +
-            '<br><br>👉 Lütfen diyaliz süresini, kan akış hızını veya dializat akış hızını gözden geçirin.' +
-            '</div>';
-    }
-
-    document.getElementById("sonuc").innerHTML = 
-        '<div style="width:100%">' +
-            '<div>Kt/V Sonucu</div>' +
-            '<div class="result-value">' + ktv.toFixed(2) + '</div>' +
-            '<div class="info">' + ktvDurum + '</div>' +
-            '<hr>' +
-            '<div>URR Sonucu</div>' +
-            '<div class="urr-value">%' + urr.toFixed(2) + '</div>' +
-            '<div class="info">' + urrDurum + '</div>' +
-            uyariHTML +
-        '</div>';
+    document.getElementById("sonuc").innerHTML = `
+        <div class="result-inner">
+            <div class="result-label">Kt/V Sonucu</div>
+            <div class="result-value">${ktv.toFixed(2)}</div>
+            <div class="info">${ktvDurum}</div>
+            <hr>
+            <div class="result-label">URR Sonucu</div>
+            <div class="urr-value">%${urr.toFixed(2)}</div>
+            <div class="info">${urrDurum}</div>
+        </div>
+    `;
 }
 
 function temizle(){
@@ -440,7 +461,7 @@ function temizle(){
     document.getElementById("saat").value = "";
     document.getElementById("uf").value = "";
     document.getElementById("agirlik").value = "";
-    document.getElementById("sonuc").innerHTML = "<div>Sonuçları görmek için tüm alanları doldurun</div>";
+    document.getElementById("sonuc").innerHTML = '<div class="empty-msg">Sonuçları görmek için tüm alanları doldurun</div>';
 }
 
 </script>
