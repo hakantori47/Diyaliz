@@ -3,24 +3,109 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
-<title>Kt/V + URR Hesaplama</title>
+<title>Hemodiyaliz Kt/V + URR Hesaplama</title>
 
 <style>
+/* ===== TEMA DEĞİŞKENLERİ ===== */
+:root {
+    --bg-color: #0f172a;
+    --text-color: #ffffff;
+    --title-bg: linear-gradient(135deg, #6366f1, #8b5cf6);
+    --title-shadow: rgba(99, 102, 241, 0.35);
+    --input-bg: #1e293b;
+    --label-bg: #334155;
+    --label-text: #e2e8f0;
+    --result-bg: #dcfce7;
+    --result-text: #111827;
+    --formula-bg: linear-gradient(135deg, #facc15, #f59e0b);
+    --formula-text: #111827;
+    --footer-color: #94a3b8;
+    --panel-bg: #1e293b;
+    --panel-text: #f1f5f9;
+    --border-color: rgba(148, 163, 184, 0.2);
+}
+
+body.theme-light {
+    --bg-color: #f1f5f9;
+    --text-color: #0f172a;
+    --title-bg: linear-gradient(135deg, #60a5fa, #3b82f6);
+    --title-shadow: rgba(59, 130, 246, 0.3);
+    --input-bg: #ffffff;
+    --label-bg: #e2e8f0;
+    --label-text: #1e293b;
+    --formula-bg: linear-gradient(135deg, #fef08a, #facc15);
+    --formula-text: #111827;
+    --footer-color: #475569;
+    --panel-bg: #ffffff;
+    --panel-text: #0f172a;
+    --border-color: rgba(100, 116, 139, 0.25);
+}
+body.theme-blue {
+    --bg-color: #082f49;
+    --text-color: #e0f2fe;
+    --title-bg: linear-gradient(135deg, #0ea5e9, #06b6d4);
+    --title-shadow: rgba(14, 165, 233, 0.4);
+    --input-bg: #0c4a6e;
+    --label-bg: #075985;
+    --label-text: #e0f2fe;
+    --formula-bg: linear-gradient(135deg, #38bdf8, #0ea5e9);
+    --formula-text: #082f49;
+    --footer-color: #7dd3fc;
+    --panel-bg: #0c4a6e;
+    --panel-text: #e0f2fe;
+    --border-color: rgba(56, 189, 248, 0.25);
+}
+body.theme-green {
+    --bg-color: #052e16;
+    --text-color: #dcfce7;
+    --title-bg: linear-gradient(135deg, #22c55e, #16a34a);
+    --title-shadow: rgba(34, 197, 94, 0.4);
+    --input-bg: #14532d;
+    --label-bg: #166534;
+    --label-text: #dcfce7;
+    --formula-bg: linear-gradient(135deg, #86efac, #4ade80);
+    --formula-text: #052e16;
+    --footer-color: #86efac;
+    --panel-bg: #14532d;
+    --panel-text: #dcfce7;
+    --border-color: rgba(74, 222, 128, 0.25);
+}
+body.theme-purple {
+    --bg-color: #2e1065;
+    --text-color: #f3e8ff;
+    --title-bg: linear-gradient(135deg, #a855f7, #d946ef);
+    --title-shadow: rgba(168, 85, 247, 0.4);
+    --input-bg: #3b0764;
+    --label-bg: #581c87;
+    --label-text: #f3e8ff;
+    --formula-bg: linear-gradient(135deg, #e9d5ff, #d8b4fe);
+    --formula-text: #2e1065;
+    --footer-color: #d8b4fe;
+    --panel-bg: #3b0764;
+    --panel-text: #f3e8ff;
+    --border-color: rgba(216, 180, 254, 0.25);
+}
+
+body.result-green  { --result-bg: #dcfce7; }
+body.result-blue   { --result-bg: #dbeafe; }
+body.result-yellow { --result-bg: #fef9c3; }
+body.result-pink   { --result-bg: #fce7f3; }
+body.result-white  { --result-bg: #ffffff; }
+
 *{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+    margin:0; padding:0; box-sizing:border-box;
     font-family:'Segoe UI', Arial, sans-serif;
     -webkit-tap-highlight-color: transparent;
 }
 
 body{
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    background: var(--bg-color);
     padding: 16px;
-    color: white;
+    color: var(--text-color);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    transition: background 0.3s, color 0.3s;
 }
 
 .container{
@@ -32,33 +117,56 @@ body{
     gap: 14px;
 }
 
-/* ÜST BAŞLIK */
 .title{
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
-    padding: 18px 20px;
+    background: var(--title-bg);
+    padding: 18px 60px 18px 20px;
     border-radius: 14px;
     font-size: 22px;
     font-weight: 700;
     text-align: center;
     letter-spacing: 0.3px;
-    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.35);
+    box-shadow: 0 8px 20px var(--title-shadow);
+    position: relative;
+    color: #ffffff;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
+    min-height: 64px;
 }
-.title span { font-size: 26px; }
+.title span.emoji { font-size: 26px; }
 
-/* FORMÜL KUTUSU */
+.settings-btn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    font-size: 22px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, transform 0.3s;
+    margin: 0; padding: 0;
+    backdrop-filter: blur(4px);
+}
+.settings-btn:hover { background: rgba(255,255,255,0.35); transform: translateY(-50%) rotate(45deg); }
+
 .formula{
-    background: linear-gradient(135deg, #facc15, #f59e0b);
-    color: #111827;
+    background: var(--formula-bg);
+    color: var(--formula-text);
     padding: 16px 18px;
     border-radius: 12px;
     line-height: 1.7;
     font-weight: 600;
     font-size: 14px;
-    box-shadow: 0 6px 16px rgba(250, 204, 21, 0.25);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
 }
 .formula b { display:block; margin-bottom: 4px; font-size: 15px; }
 .formula .formula-text {
@@ -72,7 +180,6 @@ body{
     word-break: break-word;
 }
 
-/* ANA GRID */
 .grid{
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -85,15 +192,14 @@ body{
     gap: 12px;
 }
 
-/* INPUT KUTULARI */
 .input-group{
     display: flex;
-    background: #1e293b;
+    background: var(--input-bg);
     border-radius: 12px;
     overflow: hidden;
     align-items: stretch;
-    border: 1px solid rgba(148, 163, 184, 0.15);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 .input-group:focus-within {
@@ -102,51 +208,30 @@ body{
 }
 
 .input-group label{
-    width: 42%;
-    padding: 14px 12px;
-    background: #334155;
+    width: 45%;
+    padding: 14px 14px;
+    background: var(--label-bg);
     font-weight: 600;
     font-size: 14px;
     display: flex;
     align-items: center;
-    color: #e2e8f0;
+    color: var(--label-text);
 }
 
 .input-group input{
     flex: 1;
     width: 100%;
     min-width: 0;
-    border: none;
-    outline: none;
-    padding: 14px 8px;
-    font-size: 17px;
-    font-weight: 600;
-    text-align: center;
-    background: #1e293b;
-    color: #f1f5f9;
-}
-.input-group input::placeholder { color: #64748b; }
-
-/* + / - BUTONLARI */
-.btn-arrow{
-    background: #475569;
-    color: white;
-    border: none;
-    width: 44px;
-    min-width: 44px;
-    font-size: 22px;
+    border: none; outline: none;
+    padding: 14px 12px;
+    font-size: 18px;
     font-weight: 700;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.15s, transform 0.1s;
-    user-select: none;
+    text-align: center;
+    background: var(--input-bg);
+    color: var(--text-color);
 }
-.btn-arrow:hover{ background: #6366f1; }
-.btn-arrow:active{ background: #4f46e5; transform: scale(0.95); }
+.input-group input::placeholder { color: #64748b; opacity: 0.6; }
 
-/* ANA BUTONLAR */
 button{
     margin-top: 6px;
     padding: 16px;
@@ -164,32 +249,26 @@ button{
     background: linear-gradient(135deg, #6366f1, #8b5cf6);
     box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
 }
-.hesapla-btn:hover{
-    background: linear-gradient(135deg, #4f46e5, #7c3aed);
-    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.55);
-}
+.hesapla-btn:hover{ background: linear-gradient(135deg, #4f46e5, #7c3aed); }
 .hesapla-btn:active{ transform: scale(0.98); }
 
 .temizle-btn{
     background: linear-gradient(135deg, #ef4444, #dc2626);
     box-shadow: 0 6px 16px rgba(239, 68, 68, 0.35);
 }
-.temizle-btn:hover{
-    background: linear-gradient(135deg, #dc2626, #b91c1c);
-}
+.temizle-btn:hover{ background: linear-gradient(135deg, #dc2626, #b91c1c); }
 .temizle-btn:active{ transform: scale(0.98); }
 
-/* SONUÇ KUTUSU */
 .result-box{
-    background: linear-gradient(135deg, #ecfdf5, #dcfce7);
+    background: var(--result-bg);
     border-radius: 14px;
     padding: 24px 20px;
-    color: #111827;
+    color: var(--result-text);
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
-    box-shadow: 0 10px 30px rgba(16, 185, 129, 0.2);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
     min-height: 100%;
     animation: fadeIn 0.4s ease;
 }
@@ -216,7 +295,6 @@ button{
     font-weight: 800;
     line-height: 1;
 }
-
 .urr-value{
     font-size: 40px;
     color: #2563eb;
@@ -226,15 +304,58 @@ button{
 }
 
 .info{
-    font-size: 14px;
-    color: #475569;
-    font-weight: 600;
-    padding: 5px 12px;
-    background: rgba(255,255,255,0.7);
-    border-radius: 20px;
+    font-size: 15px;
+    font-weight: 700;
     display: inline-block;
-    margin-top: 4px;
+    margin-top: 6px;
 }
+.info.durum-iyi     { color: #16a34a; }
+.info.durum-sinirda { color: #d97706; }
+.info.durum-dusuk   { color: #dc2626; }
+
+/* Stil 1: Oval Rozet */
+body.style-badge .info {
+    background: rgba(255,255,255,0.75);
+    padding: 6px 16px;
+    border-radius: 20px;
+}
+body.style-badge .info.durum-iyi     { background: #dcfce7; }
+body.style-badge .info.durum-sinirda { background: #fef3c7; }
+body.style-badge .info.durum-dusuk   { background: #fee2e2; }
+
+/* Stil 2: Düz Yazı */
+body.style-plain .info { background: transparent; padding: 0; border-radius: 0; font-size: 16px; }
+
+/* Stil 3: Kutucuk */
+body.style-box .info {
+    background: rgba(255,255,255,0.85);
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 2px solid;
+}
+body.style-box .info.durum-iyi     { border-color: #16a34a; }
+body.style-box .info.durum-sinirda { border-color: #d97706; }
+body.style-box .info.durum-dusuk   { border-color: #dc2626; }
+
+/* Stil 4: Sol Çizgili */
+body.style-border .info {
+    background: rgba(255,255,255,0.5);
+    border-left: 5px solid;
+    padding: 6px 16px;
+    border-radius: 0 8px 8px 0;
+    text-align: left;
+    min-width: 140px;
+}
+body.style-border .info.durum-iyi     { border-left-color: #16a34a; }
+body.style-border .info.durum-sinirda { border-left-color: #d97706; }
+body.style-border .info.durum-dusuk   { border-left-color: #dc2626; }
+
+/* Stil 5: Nokta */
+body.style-dot .info { background: transparent; padding: 0; font-size: 16px; }
+body.style-dot .info::before { content: "●"; margin-right: 8px; font-size: 20px; vertical-align: middle; }
+body.style-dot .info.durum-iyi::before     { color: #16a34a; }
+body.style-dot .info.durum-sinirda::before { color: #d97706; }
+body.style-dot .info.durum-dusuk::before   { color: #dc2626; }
 
 hr{
     margin: 16px auto;
@@ -243,48 +364,205 @@ hr{
     width: 60%;
 }
 
-.empty-msg {
-    color: #475569;
-    font-size: 15px;
-    font-weight: 600;
+.empty-msg { color: #475569; font-size: 15px; font-weight: 600; padding: 20px; }
+
+/* ===== REFERANS TABLOSU ===== */
+.reference-section {
+    background: var(--panel-bg);
+    color: var(--panel-text);
     padding: 20px;
+    border-radius: 14px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+}
+.reference-section h3 {
+    font-size: 17px;
+    margin-bottom: 14px;
+    text-align: center;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+.ref-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-bottom: 16px;
+}
+.ref-table:last-child { margin-bottom: 0; }
+.ref-table caption {
+    text-align: left;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 6px 0 8px 0;
+    color: var(--panel-text);
+    opacity: 0.9;
+}
+.ref-table th {
+    text-align: left;
+    padding: 8px 10px;
+    background: rgba(148, 163, 184, 0.15);
+    font-size: 12.5px;
+    font-weight: 700;
+    border-bottom: 2px solid var(--border-color);
+    opacity: 0.85;
+}
+.ref-table td {
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+}
+.ref-table tr:last-child td { border-bottom: none; }
+
+.ref-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: white;
+    white-space: nowrap;
+}
+.ref-iyi     { background: #16a34a; }
+.ref-sinirda { background: #d97706; }
+.ref-dusuk   { background: #dc2626; }
+
+.ref-note {
+    font-size: 11.5px;
+    opacity: 0.7;
+    line-height: 1.5;
+    padding: 10px 12px;
+    background: rgba(148, 163, 184, 0.1);
+    border-radius: 8px;
+    margin-top: 12px;
+    font-style: italic;
 }
 
-/* FOOTER */
 .footer{
     text-align: center;
-    color: #94a3b8;
+    color: var(--footer-color);
     font-size: 13px;
     padding: 12px 0 4px 0;
     opacity: 0.85;
 }
 
-/* ---------- MOBİL UYUM ---------- */
+/* ===== AYARLAR PANELİ ===== */
+.settings-panel {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+}
+.settings-panel.active { display: flex; }
+
+.settings-content {
+    background: var(--panel-bg);
+    color: var(--panel-text);
+    padding: 24px 22px;
+    border-radius: 18px;
+    max-width: 460px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    animation: panelIn 0.3s ease;
+    border: 1px solid var(--border-color);
+}
+@keyframes panelIn {
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.settings-content h3 {
+    font-size: 20px;
+    margin-bottom: 18px;
+    text-align: center;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-color);
+}
+.settings-content label {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    margin: 16px 0 10px 0;
+    opacity: 0.9;
+}
+.theme-grid, .style-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+.theme-option, .style-option {
+    padding: 12px 10px;
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background: rgba(255,255,255,0.08);
+    color: var(--panel-text);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    margin: 0;
+}
+.theme-option:hover, .style-option:hover { background: rgba(255,255,255,0.15); }
+.theme-option.active, .style-option.active {
+    border-color: #6366f1;
+    background: rgba(99, 102, 241, 0.2);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+.result-color-option {
+    width: 100%; height: 44px;
+    border-radius: 10px;
+    border: 3px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin: 0;
+}
+.result-color-option.active { border-color: #6366f1; transform: scale(1.05); }
+.result-colors { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+
+.close-btn {
+    width: 100%;
+    margin-top: 22px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+/* ===== MOBİL ===== */
 @media(max-width: 780px){
     body { padding: 12px; }
     .container { gap: 12px; }
-    .title { font-size: 17px; padding: 15px 16px; border-radius: 12px; }
-    .title span { font-size: 22px; }
+    .title {
+        font-size: 14px;
+        padding: 15px 56px 15px 10px;
+        min-height: 58px;
+        border-radius: 12px;
+    }
+    .title span.emoji { font-size: 19px; }
+    .settings-btn { width: 38px; height: 38px; font-size: 18px; right: 10px; }
+
     .formula { font-size: 12.5px; padding: 13px 14px; line-height: 1.6; }
     .formula b { font-size: 13.5px; }
     .formula .formula-text { font-size: 11.5px; }
 
     .grid { grid-template-columns: 1fr; gap: 12px; }
 
-    .input-group label {
-        width: 40%;
-        padding: 12px 10px;
-        font-size: 13px;
-    }
-    .input-group input {
-        padding: 12px 6px;
-        font-size: 16px;
-    }
-    .btn-arrow {
-        width: 40px;
-        min-width: 40px;
-        font-size: 20px;
-    }
+    .input-group label { width: 42%; padding: 13px 10px; font-size: 13px; }
+    .input-group input { padding: 13px 8px; font-size: 17px; }
 
     button { padding: 14px; font-size: 16px; margin-top: 4px; }
 
@@ -292,24 +570,31 @@ hr{
     .result-value { font-size: 40px; }
     .urr-value { font-size: 34px; }
     .result-label { font-size: 12.5px; }
+    .info { font-size: 14px; }
+
+    .reference-section { padding: 16px 14px; }
+    .ref-table { font-size: 12px; }
+    .ref-table th, .ref-table td { padding: 7px 6px; }
+    .ref-table caption { font-size: 13px; }
+    .ref-badge { font-size: 10.5px; padding: 2px 8px; }
 }
 
-/* Çok küçük ekranlar */
 @media(max-width: 380px){
-    .input-group label { font-size: 12px; padding: 11px 8px; }
-    .btn-arrow { width: 36px; min-width: 36px; font-size: 18px; }
+    .input-group label { font-size: 12px; padding: 12px 8px; }
     .result-value { font-size: 34px; }
     .urr-value { font-size: 30px; }
+    .title { font-size: 12px; }
 }
 </style>
 </head>
-<body>
+<body class="theme-dark result-green style-badge">
 
 <div class="container">
 
     <div class="title">
-        <span>🩺</span>
-        Kt/V + URR Diyaliz Hesaplama Sistemi
+        <span class="emoji">🩸</span>
+        Hemodiyaliz Kt/V + URR Hesaplama Sistemi
+        <button class="settings-btn" onclick="ayarlariAc()" title="Ayarlar">⚙️</button>
     </div>
 
     <div class="formula">
@@ -321,98 +606,185 @@ hr{
     </div>
 
     <div class="grid">
-
         <div class="left">
-
             <div class="input-group">
                 <label>BUN Pre</label>
-                <button class="btn-arrow" onclick="degistir('bunPre', -1)">−</button>
                 <input type="number" id="bunPre" step="0.01" placeholder="0" inputmode="decimal">
-                <button class="btn-arrow" onclick="degistir('bunPre', 1)">+</button>
             </div>
-
             <div class="input-group">
                 <label>BUN Post mg/dl</label>
-                <button class="btn-arrow" onclick="degistir('bunPost', -1)">−</button>
                 <input type="number" id="bunPost" step="0.01" placeholder="0" inputmode="decimal">
-                <button class="btn-arrow" onclick="degistir('bunPost', 1)">+</button>
             </div>
-
             <div class="input-group">
                 <label>Saat</label>
-                <button class="btn-arrow" onclick="degistir('saat', -1)">−</button>
                 <input type="number" id="saat" step="0.01" placeholder="0" inputmode="decimal">
-                <button class="btn-arrow" onclick="degistir('saat', 1)">+</button>
             </div>
-
             <div class="input-group">
                 <label>UF Vol (Litre)</label>
-                <button class="btn-arrow" onclick="degistir('uf', -1)">−</button>
                 <input type="number" id="uf" step="0.01" placeholder="0" inputmode="decimal">
-                <button class="btn-arrow" onclick="degistir('uf', 1)">+</button>
             </div>
-
             <div class="input-group">
                 <label>Ağırlık (kg)</label>
-                <button class="btn-arrow" onclick="degistir('agirlik', -1)">−</button>
                 <input type="number" id="agirlik" step="0.01" placeholder="0" inputmode="decimal">
-                <button class="btn-arrow" onclick="degistir('agirlik', 1)">+</button>
             </div>
-
             <button class="hesapla-btn" onclick="otomatikHesapla()">🧮 Hesapla</button>
             <button class="temizle-btn" onclick="temizle()">🗑️ Temizle</button>
-
         </div>
 
         <div class="result-box" id="sonuc">
             <div class="empty-msg">Sonuçları görmek için tüm alanları doldurun</div>
         </div>
-
     </div>
 
-    <div class="footer">
-        Hakan tarafından yapılmıştır
+    <!-- REFERANS TABLOSU -->
+    <div class="reference-section">
+        <h3>📋 Hemodiyaliz Kt/V ve URR Referans Değerleri</h3>
+
+        <table class="ref-table">
+            <thead>
+                <tr>
+                    <th>Parametre</th>
+                    <th>Değer Aralığı</th>
+                    <th>Değerlendirme</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td rowspan="3"><b>Kt/V</b></td>
+                    <td>≥ 1.40</td>
+                    <td><span class="ref-badge ref-iyi">İyi / Hedef</span></td>
+                </tr>
+                <tr>
+                    <td>1.20 – 1.39</td>
+                    <td><span class="ref-badge ref-sinirda">Sınırda</span></td>
+                </tr>
+                <tr>
+                    <td>&lt; 1.20</td>
+                    <td><span class="ref-badge ref-dusuk">Düşük / Yetersiz</span></td>
+                </tr>
+                <tr>
+                    <td rowspan="2"><b>URR</b></td>
+                    <td>≥ %65</td>
+                    <td><span class="ref-badge ref-iyi">Yeterli</span></td>
+                </tr>
+                <tr>
+                    <td>&lt; %65</td>
+                    <td><span class="ref-badge ref-dusuk">Düşük</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="ref-note">
+            <b>Kaynak:</b> KDOQI 2006 Hemodiyaliz Yeterlilik Kılavuzu.<br>
+            <b>Not:</b> Bu değerler yardımcı bilgi amaçlıdır, klinik kararın yerini tutmaz. Hasta bazlı değerlendirme için hekimin klinik yargısı esastır.
+        </div>
     </div>
 
+    <div class="footer">Hakan tarafından yapılmıştır</div>
+</div>
+
+<!-- ===== AYARLAR PANELİ ===== -->
+<div class="settings-panel" id="settingsPanel">
+    <div class="settings-content">
+        <h3>⚙️ Ayarlar</h3>
+
+        <label>🎨 Renk Teması</label>
+        <div class="theme-grid">
+            <button class="theme-option" data-theme="dark"    onclick="temaSec('dark')">🌙 Karanlık</button>
+            <button class="theme-option" data-theme="light"   onclick="temaSec('light')">☀️ Aydınlık</button>
+            <button class="theme-option" data-theme="blue"    onclick="temaSec('blue')">🌊 Mavi</button>
+            <button class="theme-option" data-theme="green"   onclick="temaSec('green')">🌿 Yeşil</button>
+            <button class="theme-option" data-theme="purple"  onclick="temaSec('purple')">💜 Mor</button>
+        </div>
+
+        <label>🎨 Sonuç Zemini Rengi</label>
+        <div class="result-colors">
+            <button class="result-color-option" data-color="green"  onclick="renkSec('green')"  style="background:#dcfce7;" title="Yeşil"></button>
+            <button class="result-color-option" data-color="blue"   onclick="renkSec('blue')"   style="background:#dbeafe;" title="Mavi"></button>
+            <button class="result-color-option" data-color="yellow" onclick="renkSec('yellow')" style="background:#fef9c3;" title="Sarı"></button>
+            <button class="result-color-option" data-color="pink"   onclick="renkSec('pink')"   style="background:#fce7f3;" title="Pembe"></button>
+            <button class="result-color-option" data-color="white"  onclick="renkSec('white')"  style="background:#ffffff; border:1px solid #cbd5e1;" title="Beyaz"></button>
+        </div>
+
+        <label>💬 Sonuç Gösterim Stili</label>
+        <div class="style-grid">
+            <button class="style-option" data-style="badge"  onclick="stilSec('badge')">🏷️ Oval Rozet</button>
+            <button class="style-option" data-style="plain"  onclick="stilSec('plain')">📝 Düz Yazı</button>
+            <button class="style-option" data-style="box"    onclick="stilSec('box')">🔲 Kutucuk</button>
+            <button class="style-option" data-style="border" onclick="stilSec('border')">▍Sol Çizgili</button>
+            <button class="style-option" data-style="dot"    onclick="stilSec('dot')">🔘 Nokta İşaretli</button>
+        </div>
+
+        <button class="close-btn" onclick="ayarlariKapat()">✓ Kaydet ve Kapat</button>
+    </div>
 </div>
 
 <script>
 
+/* ===== INPUT GEZİNME ===== */
 const fieldOrder = ["bunPre", "bunPost", "saat", "uf", "agirlik"];
-
 fieldOrder.forEach(function(id, index) {
     let inputElement = document.getElementById(id);
     inputElement.addEventListener("input", otomatikHesapla);
-
     inputElement.addEventListener("keydown", function(e) {
         if (e.key === "ArrowDown") {
             e.preventDefault();
             if (index + 1 < fieldOrder.length) {
                 let nextInput = document.getElementById(fieldOrder[index + 1]);
-                nextInput.focus();
-                nextInput.select();
+                nextInput.focus(); nextInput.select();
             }
         } else if (e.key === "ArrowUp") {
             e.preventDefault();
             if (index - 1 >= 0) {
                 let prevInput = document.getElementById(fieldOrder[index - 1]);
-                prevInput.focus();
-                prevInput.select();
+                prevInput.focus(); prevInput.select();
             }
         }
     });
 });
 
-function degistir(id, miktar) {
-    let input = document.getElementById(id);
-    let mevcutDeger = parseFloat(input.value);
-    if (isNaN(mevcutDeger)) mevcutDeger = 0;
-    let yeniDeger = mevcutDeger + miktar;
-    if (yeniDeger < 0) yeniDeger = 0;
-    input.value = yeniDeger;
-    otomatikHesapla();
+/* ===== AYARLAR ===== */
+function ayarlariAc() { document.getElementById("settingsPanel").classList.add("active"); }
+function ayarlariKapat() { document.getElementById("settingsPanel").classList.remove("active"); }
+document.getElementById("settingsPanel").addEventListener("click", function(e) {
+    if (e.target === this) ayarlariKapat();
+});
+
+function temaSec(tema) {
+    document.body.classList.remove("theme-dark", "theme-light", "theme-blue", "theme-green", "theme-purple");
+    document.body.classList.add("theme-" + tema);
+    localStorage.setItem("diyalizTema", tema);
+    document.querySelectorAll(".theme-option").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.theme === tema);
+    });
 }
 
+function renkSec(renk) {
+    document.body.classList.remove("result-green", "result-blue", "result-yellow", "result-pink", "result-white");
+    document.body.classList.add("result-" + renk);
+    localStorage.setItem("diyalizRenk", renk);
+    document.querySelectorAll(".result-color-option").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.color === renk);
+    });
+}
+
+function stilSec(stil) {
+    document.body.classList.remove("style-badge", "style-plain", "style-box", "style-border", "style-dot");
+    document.body.classList.add("style-" + stil);
+    localStorage.setItem("diyalizStil", stil);
+    document.querySelectorAll(".style-option").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.style === stil);
+    });
+}
+
+/* ===== SAYFA AÇILINCA YÜKLE ===== */
+window.addEventListener("DOMContentLoaded", function() {
+    temaSec(localStorage.getItem("diyalizTema") || "dark");
+    renkSec(localStorage.getItem("diyalizRenk") || "green");
+    stilSec(localStorage.getItem("diyalizStil") || "badge");
+});
+
+/* ===== HESAPLAMA ===== */
 function otomatikHesapla(){
     let bunPre = parseFloat(document.getElementById("bunPre").value);
     let bunPost = parseFloat(document.getElementById("bunPost").value);
@@ -439,18 +811,26 @@ function otomatikHesapla(){
         return;
     }
 
-    let ktvDurum = ktv >= 1.4 ? "✅ Kt/V iyi" : (ktv >= 1.2 ? "⚠️ Kt/V sınırda" : "❌ Kt/V düşük");
-    let urrDurum = urr >= 65 ? "✅ URR yeterli" : "❌ URR düşük";
+    // Kt/V değerlendirme
+    let ktvDurum = "", ktvSinif = "";
+    if(ktv >= 1.4)      { ktvDurum = "✅ Kt/V iyi (hedef)";        ktvSinif = "durum-iyi"; }
+    else if(ktv >= 1.2) { ktvDurum = "⚠️ Kt/V sınırda";            ktvSinif = "durum-sinirda"; }
+    else                { ktvDurum = "❌ Kt/V düşük (yetersiz)";   ktvSinif = "durum-dusuk"; }
+
+    // URR değerlendirme
+    let urrDurum = "", urrSinif = "";
+    if(urr >= 65) { urrDurum = "✅ URR yeterli"; urrSinif = "durum-iyi"; }
+    else          { urrDurum = "❌ URR düşük";   urrSinif = "durum-dusuk"; }
 
     document.getElementById("sonuc").innerHTML = `
         <div class="result-inner">
             <div class="result-label">Kt/V Sonucu</div>
             <div class="result-value">${ktv.toFixed(2)}</div>
-            <div class="info">${ktvDurum}</div>
+            <div class="info ${ktvSinif}">${ktvDurum}</div>
             <hr>
             <div class="result-label">URR Sonucu</div>
             <div class="urr-value">%${urr.toFixed(2)}</div>
-            <div class="info">${urrDurum}</div>
+            <div class="info ${urrSinif}">${urrDurum}</div>
         </div>
     `;
 }
