@@ -63,6 +63,7 @@ body{
     background:#1e293b;
     border-radius:10px;
     overflow:hidden;
+    align-items:center;
 }
 
 .input-group label{
@@ -73,11 +74,33 @@ body{
 }
 
 .input-group input{
-    width:55%;
+    flex:1;
+    width:100%;
     border:none;
     outline:none;
     padding:15px;
     font-size:18px;
+    text-align:center;
+}
+
+/* + ve - butonlarının stili */
+.btn-arrow{
+    background:#475569;
+    color:white;
+    border:none;
+    width:50px;
+    height:53px;
+    font-size:24px;
+    font-weight:bold;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:0.2s;
+}
+
+.btn-arrow:hover{
+    background:#6366f1;
 }
 
 button{
@@ -155,15 +178,12 @@ hr{
 }
 
 @media(max-width:850px){
-
     .grid{
         grid-template-columns:1fr;
     }
-
     .title{
         font-size:20px;
     }
-
 }
 </style>
 </head>
@@ -176,21 +196,15 @@ hr{
     </div>
 
     <div class="formula">
-
         <b>Kt/V Formülü:</b><br>
-
         Kt/V =
         -ln((BUN Post / BUN Pre) - (0.008 × Saat))
         +
         ((4 - (3.5 × BUN Post / BUN Pre)) × UF Vol / Ağırlık)
-
         <br><br>
-
         <b>URR Formülü:</b><br>
-
         URR =
         ((BUN Pre - BUN Post) / BUN Pre) × 100
-
     </div>
 
     <div class="grid">
@@ -199,30 +213,40 @@ hr{
 
             <div class="input-group">
                 <label>BUN Pre</label>
-                <input type="number" id="bunPre" step="0.01">
+                <button class="btn-arrow" onclick="degistir('bunPre', -1)">-</button>
+                <input type="number" id="bunPre" step="0.01" placeholder="0">
+                <button class="btn-arrow" onclick="degistir('bunPre', 1)">+</button>
             </div>
 
             <div class="input-group">
                 <label>BUN Post mg/dl</label>
-                <input type="number" id="bunPost" step="0.01">
+                <button class="btn-arrow" onclick="degistir('bunPost', -1)">-</button>
+                <input type="number" id="bunPost" step="0.01" placeholder="0">
+                <button class="btn-arrow" onclick="degistir('bunPost', 1)">+</button>
             </div>
 
             <div class="input-group">
                 <label>Saat</label>
-                <input type="number" id="saat" step="0.01">
+                <button class="btn-arrow" onclick="degistir('saat', -1)">-</button>
+                <input type="number" id="saat" step="0.01" placeholder="0">
+                <button class="btn-arrow" onclick="degistir('saat', 1)">+</button>
             </div>
 
             <div class="input-group">
                 <label>UF Vol (Litre)</label>
-                <input type="number" id="uf" step="0.01">
+                <button class="btn-arrow" onclick="degistir('uf', -1)">-</button>
+                <input type="number" id="uf" step="0.01" placeholder="0">
+                <button class="btn-arrow" onclick="degistir('uf', 1)">+</button>
             </div>
 
             <div class="input-group">
                 <label>Ağırlık (kg)</label>
-                <input type="number" id="agirlik" step="0.01">
+                <button class="btn-arrow" onclick="degistir('agirlik', -1)">-</button>
+                <input type="number" id="agirlik" step="0.01" placeholder="0">
+                <button class="btn-arrow" onclick="degistir('agirlik', 1)">+</button>
             </div>
 
-            <button class="hesapla-btn" onclick="hesapla()">
+            <button class="hesapla-btn" onclick="otomatikHesapla()">
                 Hesapla
             </button>
 
@@ -246,12 +270,60 @@ hr{
 
 <script>
 
-// Otomatik hesaplama: input alanlarına her yazıldığında tetiklenir
-const inputIds = ["bunPre", "bunPost", "saat", "uf", "agirlik"];
+// Kutuların sırası (Yukarı/Aşağı ok ile gezinme sırası)
+const fieldOrder = ["bunPre", "bunPost", "saat", "uf", "agirlik"];
 
-inputIds.forEach(function(id){
-    document.getElementById(id).addEventListener("input", otomatikHesapla);
+// Her kutuya hem otomatik hesaplama hem de klavye ile gezinme özelliği ekle
+fieldOrder.forEach(function(id, index) {
+    
+    let inputElement = document.getElementById(id);
+    
+    // 1. Yazı yazıldığında veya + / - butonlarına basıldığında hesapla
+    inputElement.addEventListener("input", otomatikHesapla);
+
+    // 2. Yön tuşları ile kutular arası gezinme
+    inputElement.addEventListener("keydown", function(e) {
+        
+        // Aşağı Ok (↓) tuşuna basılırsa bir sonraki kutuya geç
+        if (e.key === "ArrowDown") {
+            e.preventDefault(); // Sayının kendiliğinden azalmasını engelle
+            if (index + 1 < fieldOrder.length) {
+                let nextInput = document.getElementById(fieldOrder[index + 1]);
+                nextInput.focus();
+                nextInput.select(); // Kutudaki sayıyı otomatik seç (üzerine yazmak kolay olsun)
+            }
+        }
+        
+        // Yukarı Ok (↑) tuşuna basılırsa bir önceki kutuya geç
+        else if (e.key === "ArrowUp") {
+            e.preventDefault(); // Sayının kendiliğinden artmasını engelle
+            if (index - 1 >= 0) {
+                let prevInput = document.getElementById(fieldOrder[index - 1]);
+                prevInput.focus();
+                prevInput.select();
+            }
+        }
+    });
 });
+
+// + ve - butonları için fonksiyon
+function degistir(id, miktar) {
+    let input = document.getElementById(id);
+    let mevcutDeger = parseFloat(input.value);
+    
+    if (isNaN(mevcutDeger)) {
+        mevcutDeger = 0;
+    }
+    
+    let yeniDeger = mevcutDeger + miktar;
+    
+    if (yeniDeger < 0) {
+        yeniDeger = 0;
+    }
+    
+    input.value = yeniDeger;
+    otomatikHesapla(); 
+}
 
 function otomatikHesapla(){
 
@@ -261,117 +333,48 @@ function otomatikHesapla(){
     let uf = parseFloat(document.getElementById("uf").value);
     let agirlik = parseFloat(document.getElementById("agirlik").value);
 
-    // Alanların hepsi dolu değilse bekle
-    if(
-        isNaN(bunPre) ||
-        isNaN(bunPost) ||
-        isNaN(saat) ||
-        isNaN(uf) ||
-        isNaN(agirlik)
-    ){
-        document.getElementById("sonuc").innerHTML =
-        "Sonuçları görmek için tüm alanları doldurun";
+    if(isNaN(bunPre) || isNaN(bunPost) || isNaN(saat) || isNaN(uf) || isNaN(agirlik)){
+        document.getElementById("sonuc").innerHTML = "Sonuçları görmek için tüm alanları doldurun";
         return;
     }
 
-    // Sıfıra bölme kontrolü
     if(bunPre === 0 || agirlik === 0){
-        document.getElementById("sonuc").innerHTML =
-        "Geçersiz değer girdiniz.";
+        document.getElementById("sonuc").innerHTML = "Geçersiz değer girdiniz.";
         return;
     }
 
-    // Kt/V Hesabı
     let oran = bunPost / bunPre;
-
-    let ktv =
-        -Math.log(oran - (0.008 * saat))
-        +
-        ((4 - (3.5 * oran)) * uf / agirlik);
-
-    // URR Hesabı
-    let urr =
-        ((bunPre - bunPost) / bunPre) * 100;
+    let ktv = -Math.log(oran - (0.008 * saat)) + ((4 - (3.5 * oran)) * uf / agirlik);
+    let urr = ((bunPre - bunPost) / bunPre) * 100;
 
     if(isNaN(ktv) || !isFinite(ktv)){
-        document.getElementById("sonuc").innerHTML =
-        "Geçersiz değer girdiniz.";
+        document.getElementById("sonuc").innerHTML = "Geçersiz değer girdiniz.";
         return;
     }
 
-    // Kt/V değerlendirme
-    let ktvDurum = "";
-
-    if(ktv >= 1.4){
-        ktvDurum = "Kt/V iyi";
-    }
-    else if(ktv >= 1.2){
-        ktvDurum = "Kt/V sınırda";
-    }
-    else{
-        ktvDurum = "Kt/V düşük";
-    }
-
-    // URR değerlendirme
-    let urrDurum = "";
-
-    if(urr >= 65){
-        urrDurum = "URR yeterli";
-    }
-    else{
-        urrDurum = "URR düşük";
-    }
+    let ktvDurum = ktv >= 1.4 ? "Kt/V iyi" : (ktv >= 1.2 ? "Kt/V sınırda" : "Kt/V düşük");
+    let urrDurum = urr >= 65 ? "URR yeterli" : "URR düşük";
 
     document.getElementById("sonuc").innerHTML = `
-
         <div>
-
-            <div>
-                Kt/V Sonucu
-            </div>
-
-            <div class="result-value">
-                ${ktv.toFixed(2)}
-            </div>
-
-            <div class="info">
-                ${ktvDurum}
-            </div>
-
+            <div>Kt/V Sonucu</div>
+            <div class="result-value">${ktv.toFixed(2)}</div>
+            <div class="info">${ktvDurum}</div>
             <hr>
-
-            <div>
-                URR Sonucu
-            </div>
-
-            <div class="urr-value">
-                %${urr.toFixed(2)}
-            </div>
-
-            <div class="info">
-                ${urrDurum}
-            </div>
-
+            <div>URR Sonucu</div>
+            <div class="urr-value">%${urr.toFixed(2)}</div>
+            <div class="info">${urrDurum}</div>
         </div>
-
     `;
 }
 
-function hesapla(){
-    otomatikHesapla();
-}
-
 function temizle(){
-
     document.getElementById("bunPre").value = "";
     document.getElementById("bunPost").value = "";
     document.getElementById("saat").value = "";
     document.getElementById("uf").value = "";
     document.getElementById("agirlik").value = "";
-
-    document.getElementById("sonuc").innerHTML =
-    "Sonuçları görmek için tüm alanları doldurun";
-
+    document.getElementById("sonuc").innerHTML = "Sonuçları görmek için tüm alanları doldurun";
 }
 
 </script>
