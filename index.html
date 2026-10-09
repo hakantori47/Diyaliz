@@ -3,9 +3,37 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Kt/V + URR Hesaplama</title>
+<title>Kt/V + URR Diyaliz Hesaplama</title>
 
 <style>
+/* Tema Değişkenleri */
+:root {
+    --bg-color: #0f172a;
+    --text-color: #ffffff;
+    --title-bg: #334155;
+    --input-bg: #1e293b;
+    --label-bg: #334155;
+    --result-bg: #dcfce7;
+    --result-text: #111827;
+    --formula-bg: #facc15;
+    --formula-text: #111827;
+    --footer-color: #cbd5e1;
+}
+
+/* Aydınlık Tema Değişkenleri */
+body.light-theme {
+    --bg-color: #f1f5f9;
+    --text-color: #0f172a;
+    --title-bg: #cbd5e1;
+    --input-bg: #ffffff;
+    --label-bg: #e2e8f0;
+    --result-bg: #dcfce7; /* Sonuç kutusu yeşil kalsın */
+    --result-text: #111827;
+    --formula-bg: #fef08a;
+    --formula-text: #111827;
+    --footer-color: #475569;
+}
+
 *{
     margin:0;
     padding:0;
@@ -14,11 +42,12 @@
 }
 
 body{
-    background:#0f172a;
+    background:var(--bg-color);
     padding:20px;
-    color:white;
+    color:var(--text-color);
     min-height:100vh;
     position:relative;
+    transition: background 0.3s, color 0.3s;
 }
 
 .container{
@@ -27,18 +56,42 @@ body{
 }
 
 .title{
-    background:#334155;
-    padding:15px;
-    border-radius:10px;
-    font-size:24px;
-    font-weight:bold;
-    margin-bottom:15px;
+    background:var(--title-bg);
+    padding:18px;
+    border-radius:12px;
     text-align:center;
+    font-size:32px;
+    font-weight:bold;
+    margin-bottom:20px;
+    box-shadow:0 0 15px rgba(0,0,0,0.3);
+    position: relative;
 }
 
+/* Tema Butonu */
+.tema-btn {
+    position: absolute;
+    right: 10px;
+    top: 15px;
+    background: #6366f1;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    font-size: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+}
+.tema-btn:hover { background: #4f46e5; }
+
 .formula{
-    background:#facc15;
-    color:#111827;
+    background:var(--formula-bg);
+    color:var(--formula-text);
     padding:15px;
     border-radius:10px;
     margin-bottom:20px;
@@ -60,17 +113,19 @@ body{
 
 .input-group{
     display:flex;
-    background:#1e293b;
+    background:var(--input-bg);
     border-radius:10px;
     overflow:hidden;
     align-items:center;
+    border: 1px solid rgba(148, 163, 184, 0.2);
 }
 
 .input-group label{
     width:45%;
     padding:15px;
-    background:#334155;
+    background:var(--label-bg);
     font-weight:bold;
+    color: var(--text-color);
 }
 
 .input-group input{
@@ -81,9 +136,10 @@ body{
     padding:15px;
     font-size:18px;
     text-align:center;
+    background:var(--input-bg);
+    color:var(--text-color);
 }
 
-/* + ve - butonlarının stili */
 .btn-arrow{
     background:#475569;
     color:white;
@@ -114,29 +170,20 @@ button{
     transition:0.3s;
 }
 
-.hesapla-btn{
-    background:#6366f1;
-}
+.hesapla-btn{ background:#6366f1; }
+.hesapla-btn:hover{ background:#4f46e5; }
 
-.hesapla-btn:hover{
-    background:#4f46e5;
-}
-
-.temizle-btn{
-    background:#ef4444;
-}
-
-.temizle-btn:hover{
-    background:#dc2626;
-}
+.temizle-btn{ background:#ef4444; }
+.temizle-btn:hover{ background:#dc2626; }
 
 .result-box{
-    background:#dcfce7;
+    background:var(--result-bg);
     border-radius:10px;
     padding:25px;
-    color:#111827;
+    color:var(--result-text);
     min-height:350px;
     display:flex;
+    flex-direction: column;
     align-items:center;
     justify-content:center;
     text-align:center;
@@ -168,22 +215,32 @@ hr{
     border-top:2px solid #cbd5e1;
 }
 
+/* Özellik 4: Uyarı Sistemi Kutusu */
+.warning-box {
+    display: none;
+    background: #fef2f2;
+    border: 2px solid #ef4444;
+    color: #b91c1c;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+    font-weight: bold;
+    font-size: 15px;
+    text-align: left;
+}
+
 .footer{
-    position:fixed;
-    bottom:10px;
-    right:15px;
-    color:#cbd5e1;
+    margin-top: 20px;
+    text-align: center;
+    color:var(--footer-color);
     font-size:14px;
     opacity:0.8;
 }
 
 @media(max-width:850px){
-    .grid{
-        grid-template-columns:1fr;
-    }
-    .title{
-        font-size:20px;
-    }
+    .grid{ grid-template-columns:1fr; }
+    .title{ font-size:20px; }
+    .tema-btn { width: 35px; height: 35px; font-size: 16px; top: 12px; }
 }
 </style>
 </head>
@@ -193,24 +250,21 @@ hr{
 
     <div class="title">
         Kt/V + URR Diyaliz Hesaplama Sistemi
+        <!-- Özellik 5: Tema Değiştirme Butonu -->
+        <button class="tema-btn" onclick="temaDegistir()" title="Temayı Değiştir">🌗</button>
     </div>
 
     <div class="formula">
         <b>Kt/V Formülü:</b><br>
-        Kt/V =
-        -ln((BUN Post / BUN Pre) - (0.008 × Saat))
-        +
-        ((4 - (3.5 × BUN Post / BUN Pre)) × UF Vol / Ağırlık)
+        Kt/V = -ln((BUN Post / BUN Pre) - (0.008 × Saat)) + ((4 - (3.5 × BUN Post / BUN Pre)) × UF Vol / Ağırlık)
         <br><br>
         <b>URR Formülü:</b><br>
-        URR =
-        ((BUN Pre - BUN Post) / BUN Pre) × 100
+        URR = ((BUN Pre - BUN Post) / BUN Pre) × 100
     </div>
 
     <div class="grid">
 
         <div class="left">
-
             <div class="input-group">
                 <label>BUN Pre</label>
                 <button class="btn-arrow" onclick="degistir('bunPre', -1)">-</button>
@@ -246,18 +300,12 @@ hr{
                 <button class="btn-arrow" onclick="degistir('agirlik', 1)">+</button>
             </div>
 
-            <button class="hesapla-btn" onclick="otomatikHesapla()">
-                Hesapla
-            </button>
-
-            <button class="temizle-btn" onclick="temizle()">
-                Temizle
-            </button>
-
+            <button class="hesapla-btn" onclick="otomatikHesapla()">Hesapla</button>
+            <button class="temizle-btn" onclick="temizle()">Temizle</button>
         </div>
 
         <div class="result-box" id="sonuc">
-            Sonuçları görmek için tüm alanları doldurun
+            <div>Sonuçları görmek için tüm alanları doldurun</div>
         </div>
 
     </div>
@@ -270,33 +318,21 @@ hr{
 
 <script>
 
-// Kutuların sırası (Yukarı/Aşağı ok ile gezinme sırası)
 const fieldOrder = ["bunPre", "bunPost", "saat", "uf", "agirlik"];
 
-// Her kutuya hem otomatik hesaplama hem de klavye ile gezinme özelliği ekle
 fieldOrder.forEach(function(id, index) {
-    
     let inputElement = document.getElementById(id);
-    
-    // 1. Yazı yazıldığında veya + / - butonlarına basıldığında hesapla
     inputElement.addEventListener("input", otomatikHesapla);
-
-    // 2. Yön tuşları ile kutular arası gezinme
     inputElement.addEventListener("keydown", function(e) {
-        
-        // Aşağı Ok (↓) tuşuna basılırsa bir sonraki kutuya geç
         if (e.key === "ArrowDown") {
-            e.preventDefault(); // Sayının kendiliğinden azalmasını engelle
+            e.preventDefault();
             if (index + 1 < fieldOrder.length) {
                 let nextInput = document.getElementById(fieldOrder[index + 1]);
                 nextInput.focus();
-                nextInput.select(); // Kutudaki sayıyı otomatik seç (üzerine yazmak kolay olsun)
+                nextInput.select();
             }
-        }
-        
-        // Yukarı Ok (↑) tuşuna basılırsa bir önceki kutuya geç
-        else if (e.key === "ArrowUp") {
-            e.preventDefault(); // Sayının kendiliğinden artmasını engelle
+        } else if (e.key === "ArrowUp") {
+            e.preventDefault();
             if (index - 1 >= 0) {
                 let prevInput = document.getElementById(fieldOrder[index - 1]);
                 prevInput.focus();
@@ -306,27 +342,31 @@ fieldOrder.forEach(function(id, index) {
     });
 });
 
-// + ve - butonları için fonksiyon
+/* Özellik 5: Tema Değiştirme Fonksiyonu */
+function temaDegistir() {
+    document.body.classList.toggle("light-theme");
+    // İkonu güncelle (Aydınlık modda güneş, karanlık modda ay)
+    let btn = document.querySelector(".tema-btn");
+    if (document.body.classList.contains("light-theme")) {
+        btn.innerHTML = "☀️";
+        btn.style.background = "#f59e0b";
+    } else {
+        btn.innerHTML = "🌙";
+        btn.style.background = "#6366f1";
+    }
+}
+
 function degistir(id, miktar) {
     let input = document.getElementById(id);
     let mevcutDeger = parseFloat(input.value);
-    
-    if (isNaN(mevcutDeger)) {
-        mevcutDeger = 0;
-    }
-    
+    if (isNaN(mevcutDeger)) mevcutDeger = 0;
     let yeniDeger = mevcutDeger + miktar;
-    
-    if (yeniDeger < 0) {
-        yeniDeger = 0;
-    }
-    
+    if (yeniDeger < 0) yeniDeger = 0;
     input.value = yeniDeger;
     otomatikHesapla(); 
 }
 
 function otomatikHesapla(){
-
     let bunPre = parseFloat(document.getElementById("bunPre").value);
     let bunPost = parseFloat(document.getElementById("bunPost").value);
     let saat = parseFloat(document.getElementById("saat").value);
@@ -355,8 +395,19 @@ function otomatikHesapla(){
     let ktvDurum = ktv >= 1.4 ? "Kt/V iyi" : (ktv >= 1.2 ? "Kt/V sınırda" : "Kt/V düşük");
     let urrDurum = urr >= 65 ? "URR yeterli" : "URR düşük";
 
+    /* Özellik 4: Uyarı Sistemi Kontrolü */
+    let uyariHTML = "";
+    if (ktv < 1.2 || urr < 65) {
+        uyariHTML = `
+            <div class="warning-box">
+                ⚠️ DİKKAT: Kt/V değeri çok düşük! <br> 
+                Lütfen diyaliz süresini, kan akış hızını veya dializat akış hızını gözden geçirin.
+            </div>
+        `;
+    }
+
     document.getElementById("sonuc").innerHTML = `
-        <div>
+        <div style="width:100%">
             <div>Kt/V Sonucu</div>
             <div class="result-value">${ktv.toFixed(2)}</div>
             <div class="info">${ktvDurum}</div>
@@ -364,6 +415,7 @@ function otomatikHesapla(){
             <div>URR Sonucu</div>
             <div class="urr-value">%${urr.toFixed(2)}</div>
             <div class="info">${urrDurum}</div>
+            ${uyariHTML}
         </div>
     `;
 }
